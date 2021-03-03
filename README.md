@@ -39,8 +39,10 @@ Files Structure
         - `"input"`: raw datasets; 
         - `"/output"`: cleaned dataset; 
         - `"documentation"`: with at least two files: 
+        
               - `"_metadata.txt"` text file that describes the data, provides access instructions, and an example of citation following the AEA guidelines;
               - `"codebook_datasetName.txt"` text file with summary statistics and variables description;
+              
     b. `"data/projectSpecific"`: sample of interest, intermediate  datasets with the variables of interest, and merged sample for analysis;
     c. `"data/analysis"`: analysis outputs, including all figures and tables presented in the paper;
     d. `"data/_temp"`: temporary files output (to be filled when running some .R scripts).
