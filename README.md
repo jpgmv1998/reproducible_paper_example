@@ -11,7 +11,8 @@ knit: (function(inputFile, encoding) {
 ---
 
 
-> IMPORTANT OBSERVATION: This README is written as if all data files were included in the replication package. However, because GitHub has a hard limit of 100 Mb for individual files it was not possible. If you want to see a complete version (including all data files) see the repository uploaded at Zenodo (PENDING - LINK TO ZENODO).
+
+> IMPORTANT OBSERVATION: This README is written as if all data files were included in the replication package. However, because GitHub has a hard limit of 100 Mb for individual files it was not possible. If you want to see a complete version (including all data files) see the repository uploaded at Zenodo (https://doi.org/10.5281/zenodo.4579463). [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4579463.svg)](https://doi.org/10.5281/zenodo.4579463)
 
 Overview
 --------
