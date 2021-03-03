@@ -47,7 +47,7 @@ ExportTimeProcessing <- function(fctn.codeDir = "") {
     time.in.seconds <-
       tictoc::tic.log(format = T) %>%
       as.character() %>%
-      str_extract(pattern = "\\d{1,7}.\\d{1,3}") %>%
+      str_extract(pattern = "\\d{1,7}\\.\\d{1,3}") %>%
       as.numeric()
 
     if (time.in.seconds > 86400) {

@@ -1,256 +1,213 @@
-# Reproducible Paper Template (:construction: UNDER CONSTRUCTION :construction:)
+---
+title: "README -- Data and Code for: \"Reproducible Paper Example\""
+subtitle: ""
+author: "João Pedro Vieira"
+date: 03/03/2021
+output:
+  html_document: default
+  pdf_document: default
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_format = "all") })
+---
 
-Main goal: Create a template repository for starting a new paper project implementing good practices for reproducibility.
 
-Author: João Pedro Vieira
+> IMPORTANT OBSERVATION: This README is written as if all data files were included in the replication package. However, because GitHub has a hard limit of 100 Mb for individual files it was not possible. If you want to see a complete version (including all data files) see the repository uploaded at Zenodo (PENDING - LINK TO ZENODO).
 
-Software: Focused on empirical projects that use mostly R for data manipulation. Tested using R version 4.0.2 and RStudio version 1.4.1103 on Windows.
+Overview
+--------
 
-Disclaimer: This project aims to incorporate reproducible workflows gathered from multiple sources based on the author's personal preferences, needs, and limitations. 
+The code in this replication package cleans the raw data for each data source (4 sources), extracts the relevant information specifically for the project, combines it, and generates the results using R. A master file run all of the code to generate the data for the PENDING figures and PENDING tables in the paper. The replicator should expect the code to run for about PENDING hours divided into 35 minutes in the cleaning part, 45 minutes in the extraction/merge part, and PENDING in the final analysis part. A specific time for all individual scripts is reported in csv files with the prefix `"_timeProcessing_"` in each code folder. All the data is provided, from raw to final including intermediate, so it is possible to skip any individual script.
 
-Feedback and suggestions are welcome to improve this project. :rocket:
+Files Structure 
+----------------------------
 
-Ideas for implementation are stored on [Issues](https://github.com/jpgmv1998/reproducible_paper_template/issues).
+1. `"README.md"`: a markdown file used to generate `"README.pdf"` and `"README.html"`.
+ 
+2. `"README.pdf"`: This document. It provides the necessary information about the structure of the replication folder, data sources and access, computational requirements, and ultimately explains how to fully replicate the analysis presented in the paper. Also available in html format `"README.html"` (best for reading).
+ 
+3. `"code`: a folder containing all scripts to clean, build, merge, and analyze the data
 
-## Features
+    a. `"code/raw2clean"`: R scripts that clean the data on input and save on the output for each dataset;
+    b. `"code/projectSpecific"`: R scripts that select/combine/construct the information relevant for this project and creates the sample for analysis;
+    c. `"code/analysis"`: R scripts to generate the results presented in the paper;
+    d. `"code/_functions"`: auxiliary folder with custom R functions used in multiple R scripts.
 
-* [Random References](randomReferences.md) - File intended to store links for references that may be useful for empirical work (e.g. R, Econometrics, Git, etc).
+4. `"data"`: a folder containing data in a variety of formats: raw, cleaned, intermediate, final datasets for analysis, and analysis outputs
 
-* R Project (with git - optional) - Allows better use of relative paths, helps with version control connecting RStudio directly to a GitHub project (requires previous setup - see more about [here](https://happygitwithr.com/)).
+    a. `"data/raw2clean"`: one folder for each dataset with the following structure:
+        - `"input"`: raw datasets; 
+        - `"/output"`: cleaned dataset; 
+        - `"documentation"`: with at least two files: 
+            * `"_metadata.txt"` text file that describes the data, provides access instructions, and an example of citation following the AEA guidelines;
+            * `"codebook_datasetName.txt"` text file with summary statistics and variables description;
+    b. `"data/projectSpecific"`: sample of interest, intermediate  datasets with the variables of interest, and merged sample for analysis;
+    c. `"data/analysis"`: analysis outputs, including all figures and tables presented in the paper;
+    d. `"data/_temp"`: temporary files output (to be filled when running some .R scripts).
 
-* R packages management - Use of `renv` package to help with package version management and reproducibility (see more about [here](https://rstudio.github.io/renv/articles/renv.html)).
+5. `"reproducible_paper_example.Rproj"`: R project to automatically adjust file path references. Always open RStudio from this file when running any R script.
 
-* [Code and data folders structure](#folders-structure) - suggestion of folder structure to organize all code and data files.
-
-* [File templates and examples](#file-templates-and-examples) - template files contain the suggested structure for that type of file, and example files are applcations of the templates using real data.
-
-* [Replication Archive README template](https://github.com/jpgmv1998/reproducible_paper_template/blob/master/_template_README.md) adapted from the [AEA Template](https://social-science-data-editors.github.io/template_README/) - The AEA template README is in a form that follows best practices as defined by a number of data editors at social science journals. 
-
-* [Replication Archive README example - PENDING](https://github.com/jpgmv1998/reproducible_paper_template/blob/master/_example_README.md) - Application of the provided README template based on the examples present in this project. 
-
-* Custom function to automatically generate csv files containing the time of processing of each script - [ExportTimeProcessing](https://github.com/jpgmv1998/reproducible_paper_template/blob/master/code/_functions/ExportTimeProcessing.R).
-
-* For each raw dataset:
-    - Added `_metadata` template and examples with data description, access, and citation to be referenced in the Data Availability Statement section of the replication README.
-    - Incorporated routine to generate codebooks after initial cleaning - adapted from [R guide](https://github.com/skhiggins/R_guide).
-    ```r   
-    # CODEBOOK GENERATION (VARIABLES DESCRIPTION + SUMMARY STATISTICS)
-    sink("data/raw2clean/datasetName_dataSource/documentation/codebook_datasetName.txt") # create text file to be filled with console output
-
-    # if the object is spatial (sf class) drop geoemtry column to simplify the codebook and avoid error in describe
-    if (any(class(clean.datasetName) == "sf")) {
-
-      clean.datasetName %>% sf::st_drop_geometry() %>% Hmisc::describe() %>% print()
-      clean.datasetName %>% sf::st_drop_geometry() %>% skimr::skim()     %>% print()
-
-    } else {
-
-      clean.datasetName %>% Hmisc::describe() %>% print()
-      clean.datasetName %>% skimr::skim()     %>% print()
-    }
-    sink() # close the sink
-    ```
-
-## How to use
-
-* Select use this template on the upper right corner (or click [here](https://github.com/jpgmv1998/reproducible_paper_template/generate)) and follow the instructions to create your own GitHub repository.
-
-* If you want to use version control within the RStudio project with git see this [tutorial](https://happygitwithr.com/) then:
-    * Open RStudio > File > New Project... > Version Control > Git > insert the url, that appears when clicking on code in your GitHub repository, on Repository URL.
-
-* When using R always open RStudio using the .Rproj file.
-
-* If you want to use R packages management see this [vignette](https://rstudio.github.io/renv/articles/renv.html) then:
-   * Open RProject and execute `install.packages("renv")` if you do not have it installed yet.
-   * If you already substituted all files with prefixes `_example_` and `_template_` with your own scripts, then:
-      * Execute `renv::init()` to develop a "local library" of the packages employed in a project. It will create the following files and folders in the project directory: `renv.lock`, `.Rprofile`, and `renv/.` Binaries of the project's packages will be stored in the `renv/library/` subfolder.
-      * When working on the project, use `renv::install()` to add any extra package that was not present before, and use `renv::snapshot()` to update your renv-related files. Make sure these are updated when pushing project changes to GitHub, sharing files with others, or preparing the replication package.
-   * If you are starting a fresh project and want to substitute the files with prefixes `_example_` and `_template_` while developing the project, then:
-      * Execute `renv::init(bare = T)`. It will activate the renv structure to the project adding the same files as mentioned above, but the argument `bare = T` will make it skip the scan step and it will not install any package automatically.
-      * When working on the project, use `renv::install()` to add any necessary package to the project library (even if you already have it installed locally or in another project), and use `renv::snapshot()` to update your renv-related files. Make sure these are updated when pushing project changes to GitHub, sharing files with others, or preparing the replication package.
-
-## Files description
-
-- `.gitignore`, a text file that tells Git which files/folders should be ignored (not included in the version control system). When using GitHub repositories it is important to be aware of its [size limits](https://docs.github.com/en/free-pro-team@latest/github/managing-large-files/what-is-my-disk-quota) and ignore large files. Also, there are other types of files that you should ignore, see more [here](https://henriquesd.medium.com/the-gitignore-file-dc293f6c80fb). In this template the default is to ignore some R files including data output, and folders in `data` that normally contain large files (`data/raw2clean/datasetName_dataSource/input`; `data/raw2clean/datasetName_dataSource/output`; `data/projectSpecific`). Instead of adding these folder patterns in this specific file, we add one `.gitignore` file inside each relevant folder. In this way, we can preserve the folder structure, while avoiding committing large files.
-
-- `LICENSE`, a file to allow others to reproduce, distribute, or create derivatives works using this project.
-
-- `README.md` this file, a general overview of the project in markdown format.
-
-- `randomReferences.md`, a file intended to store links for references that may be useful for empirical work (e.g. R, Econometrics, Git, etc) in markdown format.
-
-- `_template_README.md`, a template file for a replication README adapted from the [AEA Template](https://social-science-data-editors.github.io/template_README/).
-
-- `_example_README.md`, an example file for a replication README retrieved from the [AEA Deposit](https://www.openicpsr.org/openicpsr/search/aea/studies).
-
-- `brainstorming`, a folder to store research ideas, peer feedback, etc. Contains:
-  * `_template_research_project.Rmd`, a template (in Rmarkdown format) to organize and structure the first ideas about the project (draft version). Produces `_template_research_project.pdf` as output.
-
-## Folders structure
-
-This section explains how code and data are organized, the structure of folders, and suggestions of patterns for file names. In practice, the files inside the folders are examples and templates, thus they have the prefixes `_example_` or `_template_` in their names, and will be described in the [File templates and examples](#file-templates-and-examples) section. As noted before this template is very biased towards the author's preferences, needs, and limitations. For other references see the [Reproducibility section](https://github.com/jpgmv1998/reproducible_paper_template/blob/master/randomReferences.md#reproducibility) in `randomReferences.md`.
-
-### `code`
-
-All files inside this folder should be in version control and committed regularly when changes are made.
-
-* `raw2clean` - a folder containing:
-
-    * one `datasetName_raw2clean.R` R script for each dataset folder in `data/raw2clean`. The goal of each script is to read the file(s) in the `data/raw2clean/datasetName_dataSource/input` folder, perform simple cleaning tasks, and save the cleaned data in the `data/raw2clean/datasetName_dataSource/output` folder preferably in `.Rdata` format (raster is an exception and should be saved as `.tif` format). 
-        
-    * `_masterfile_raw2clean.R` - an R script to source all raw2clean R scripts and specify the order when relevant.
+6. `"renv"`: a folder to be filled with an isolated library containing all R packages and dependencies with the correct versions. It also contains:
     
-    * `_timeProcessing_raw2clean.csv` - a csv file containing the time each script took to run.
+    a. `"active.R"`: a script to activate the renv structure when using the project for the first time
+    b. `"settings.dcf"`: a file to store the settings used in the renv project
 
-* `projectSpecific` - a folder containing:
-    
-    * possibly multiple folders, if the project has more than one base sample for analysis (e.g one sample at the municipality level and the other at the individual level). Each folder should contain:
-      
-      * `sampleConstruction_projectSpecific_folderName.R` - an R script to create the samples of interest (e.g. panel, cross-section, spatial).
-      
-      * multiple R scripts with pattern `dataFormat_variableTheme_projectSpecific_folderName.R`, with `dataFormat` being at least one of the following: `spatial`, `panel`, `crossSection`, to extract/create the variables of interest using one or more data files from `data/raw2clean/datasetName_dataSource/output`, and merge with the relevant sample (according to `dataFormat`). If there is only one relevant format exclude the prefix `dataFormat`.
-    
-      * `dataFormat_forAnalysis_folderName.R` - R script(s) to combine all relevant files in `data/projectSpecific/folderName` into an output file for analysis, with `dataFormat` being at least one of the following: `spatial`, `panel`, `crossSection`. If there is only one relevant format exclude the prefix `dataFormat`.
-      
-      * `_masterfile_projectSpecific_folderName.R` - an R script to source all `projectSpecifc/folderName` R scripts in the desired sequence.
-      
-      * `_timeProcessing_projectSpecific_folderName.csv` - a csv file containing the time each script took to run.  
-      
-* `analysis` - a folder containing some folders like:
-  
-  * `maps` - to generate maps when using spatial data.
-  
-  * `stats` - to generate descriptive statistics (tables/graphics)
+7. `"renv.lock"`: a file containing the specifications of R and its dependencies necessary for renv to restore them to a new computer.
 
-  * `regs` - to generate regression outputs (tables/graphics).
-  
+8. `".Rprofile"`: a file that will be automatically sourced whenever you open the RProject (`"reproducible_paper_example.Rproj"`) and that will source `"active.R"` script to guarantee that the renv structure is being used.
 
-* `_functions` - a folder containing R scripts with custom functions used in multiple scripts across the project like:
+8. `"LICENSE.txt"`: a text file with a dual-license setup.
 
-  * `ExportTimeProcessing.R` - an R script to store `ExportTimeProcessing` function used to calculate and export the time of processing of each R script.
 
-### `data`
 
-The default of this folder is to ignore all folders that normally contain large files (`data/raw2clean/datasetName_dataSource/input`; `data/raw2clean/datasetName_dataSource/output`; `data/projectSpecific`). However, if your project only has small files respecting [GitHub limits](https://docs.github.com/en/free-pro-team@latest/github/managing-large-files/what-is-my-disk-quota) (in my experience this is a rare case) you can have everything in the version control (which is ideal) just by removing the `.gitignore` files inside the `data` folders and adjusting the `.gitignore` in the root removing `.Rdata` and `.RData` patterns. 
+Data Availability and Provenance Statements
+----------------------------
 
-* `raw2clean` - a folder containing:
+### Statement about Rights
 
-    * one `data/raw2clean/datasetName_dataSource` folder for each dataset. Each folder has three folders: 
-    
-        * `documentation` - containing always the `_metadata` file with information about the download and the dataset, additionally can contain other relevant documents.
-        
-        * `input` - containing the raw data stored in the original format you should never change it, only unzip and extract the files from the downloaded folder when necessary.
-        
-        * `output` - containing usually a single `.Rdata` file with the cleaned data, but sometimes multiple `.Rdata` may be necessary due to size constraints, or the `.tif` format may be used when the input data is a raster file.
-        
+- [X] I certify that the author(s) of the manuscript have legitimate access to and permission to use the data used in this manuscript. 
 
-* `projectSpecific` - a folder containing:
-    
-    * possibly multiple folders, if the project has more than one base sample for analysis (e.g one sample at the municipality level and the other at the individual level). Each folder should contain:
-    
-      * whenever `dataFormat` is used it can represent at least one of the following: `spatial`, `panel`, `crossSection`. If there is only one relevant format exclude the prefix `dataFormat`.
-    
-      * the output(s) of `sampleConstruction_projectSpecific_folderName.R` with the following name pattern: `dataFormat_sample_folderName.Rdata`.
-      
-      * the output of each R script with pattern `dataFormat_variableTheme_projectSpecific_folderName.R` with the following name pattern: `dataFormat_variableTheme_folderName.Rdata`.
-    
-      * the output(s) of `sample_forAnalysis_folderName.R` file with the following name pattern: `dataFormat_forAnalysis_folderName.Rdata`.
-      
-     
-* `analysis` - a folder, that may need more adaptations accordingly to the project, containing some folders like:
-  
-  * `maps` - to store maps when using spatial data.
-  
-  * `stats` - to store descriptive statistics (tables/graphics)
 
-  * `regs` - to store regression outputs (tables/graphics).
-  
-* `_temp` - a folder to store temporary files (e.g. files automatically generated when processing raster data)
-  
+### License for Data 
 
-## File templates and examples
+The data is licensed under a Creative Commons Attribution 4.0 International Public License. See [LICENSE.txt](LICENSE.txt) for details.
 
-All files with the prefix `_template_` contain the suggested structure for that type of file, and all files with the prefix `_example_` contain files adapted from its template version using real data. When using this template all these files should be replaced or removed from your project. 
+### Summary of Availability
 
-### `code`
+- [X] All data **are** publicly available.
 
-* `raw2clean` - a folder containing:
+The data used to support the findings of this study comes from multiple data sources, all of them are publicly available online, and have been deposited in a Zenodo repository (Vieira, 2021). Each raw dataset is listed and described in more detail below. Access to download from the original source is guaranteed by providing a persistent link, using the Save a Page feature from Archive.org, pointing directly to the data download.
 
-    * The template and four examples of the `datasetName_raw2clean.R`: 
-    
-      * `code/raw2clean/_template_datasetName_raw2clean.R` - an R script containing only the general structure of this type of file.
-      * `code/raw2clean/_example_muniDivision2015_raw2clean.R` - a real example of a raw2clean R script with spatial data as input.
-      * `code/raw2clean/_example_biomesDivision_raw2clean.R` - a real example of a raw2clean R script with spatial data as input.
-      * `code/raw2clean/_example_priorityMuniAmazon_raw2clean.R` - a real example of a raw2clean R script with tabular data as input (.txt format).
-      * `code/raw2clean/_example_prodesDeforestationAmazon_raw2clean.R` - a real example of a raw2clean R script with tabular data as input (.pdf format).
-        
-    * The template `_template_masterfile_raw2clean.R` and an example `_example_masterfile_raw2clean.R` of the `masterfile_raw2clean.R`.
-    
-    * An example `_example_timeProcessing_raw2clean.csv` of the `_timeProcessing_raw2clean.csv`.
+### Details on each Data Source
 
-* `projectSpecific` - a folder containing:
-    
-    * An example folder `muniLevel` with:
-      
-      * An example `_example_sampleConstruction_projectSpecific_muniLevel.R` of the `sampleConstruction_projectSpecific_folderName.R`.
-      
-      * Two examples `code/projectSpecific/_example_panel_priorityMuniAmazon_projectSpecific_muniLevel.R`, and `code/projectSpecific/_example_panel_prodesDeforestationAmazon_projectSpecific_muniLevel.R` of the `dataFormat_variableTheme_projectSpecific_folderName.R`. 
-      
-      * An example `_example_sample_forAnalysis_muniLevel.R` of the `sample_forAnalysis_folderName.R`.
-      
-      * An example `_example_masterfile_projectSpecific_muniLevel.R` of the `_masterfile_projectSpecific_folderName.R`.
-  
-      * An example `_example_timeProcessing_projectSpecific_muniLevel.csv` of the `_timeProcessing_projectSpecific_folderName.csv`.
-      
-    * The template folder `folderName` containing:
-    
-        * The template `_template_sampleConstruction_projectSpecific_folderName.R` of the `sampleConstruction_projectSpecific_folderName.R`.
+#### Brazilian Biomes Division
 
-        * The template `code/projectSpecific/_template_dataFormat_variableTheme_projectSpecific_folderName.R` of the `dataFormat_variableTheme_projectSpecific_folderName.R`.
+Data on Brazilian Biomes Division were downloaded from the Instituto Brasileiro de Geografia e Estatística (IBGE) (IBGE, 2019). Data can be directly downloaded from https://web.archive.org/web/20200916173523/ftp://geoftp.ibge.gov.br/informacoes_ambientais/estudos_ambientais/biomas/vetores/Biomas_250mil.zip. The link will download a zip file containing multiple files that compose the shapefile (.shp, .prj, .shx, .sbn, .xml, .cpg). The zip file was manually unzipped and its files were moved to the `"raw2clean/biomeDivision_ibge/input"` folder. A copy of the data is provided as part of this archive. The data are in the public domain.
 
-        * The template `_template_sample_forAnalysis_folderName.R` of the `sample_forAnalysis_folderName.R`.
+Datafiles: multiple files with pattern `"lm_bioma_250"`
 
-        * The template `_template_masterfile_projectSpecific_folderName.R` of the `_masterfile_projectSpecific_folderName.R`.
+Codebook: `"raw2clean/biomeDivision_ibge/documentation/codebook_biomeDivision.txt"`
 
-        
-* `analysis` - a folder containing some folders like (pending addition of examples and templates):
-  
-  * `maps` - a folder containing:
-  
-    *
-  
-  * `stats` - a folder containing:
-  
-    *
+Metadata: `"raw2clean/biomeDivision_ibge/documentation/_metadata.txt"`
 
-  * `regs` - a folder containing:
-  
-    *
+#### Brazilian Municipality Division
 
-* `_functions` - a folder containing R scripts with custom functions used in multiple scripts across the project like:
+Data on Brazilian Municipality Division were downloaded from the Instituto Brasileiro de Geografia e Estatística (IBGE) (IBGE, 2015). Data can be directly downloaded from https://web.archive.org/web/20200916142056/ftp://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2015/Brasil/BR/br_municipios.zip. The link will download a zip file containing multiple files that compose the shapefile (.shp, .prj, .shx, .dbf, .cpg). The zip file was manually unzipped and its files were moved to the `"raw2clean/muniDivision2015/input"` folder. A copy of the data is provided as part of this archive. The data are in the public domain.
 
-  * `_example_ExportTimeProcessing.R` - an R script to store example_ExportTimeProcessing function used to calculate and export the time of processing of each R example script. Used only to adapt the output name adding the prefix `_example`, in practice you should exclude this function and only use the `ExporTimeProcessing.R` version.
+Datafiles: multiple files with pattern `"BRMUE250GC_SIR"`
 
-### `data`
+Codebook: `"raw2clean/muniDivision2015/documentation/codebook_muniDivision2015.txt"`
 
-* `raw2clean` - a folder containing four folder examples and one template folder:
+Metadata: `"raw2clean/muniDivision2015/documentation/_metadata.txt"`
 
-  * Examples: `example_biomeDivision_ibge`; `example_muniDivision2015_ibge`; `example_priorityMuniAmazon_mma`; `example_prodesDeforestationAmazon_inpe`. 
-  
-  * For each example folder, you should follow the download instructions in `documentation/_metadata.txt` and save the data in the `input` folder. The `output` folder will be automatically populated when running the `_example_masterfile_raw2clean.R`.
-  
-  * The template `_template_datasetName_dataSource` contains a skeleton of the `_metadata.txt` file in `documentation` and the folder structure to be used for your own datasets.
 
-* `projectSpecific` - a folder containing:
-    
-    * An empty example folder `muniLevel` and an empty template folder `folderName`. The example folder `muniLevel` will be automatically populated when running the `_example_masterfile_projectSpecific_muniLevel.R` script with:
-      
-      *  Three examples `_example_spatial_sample_muniLevel.Rdata`, `_example_panel_sample_muniLevel.Rdata`, and `_example_crossSection_sample_muniLevel.Rdata` of the `dataFormat_sample_folderName.Rdata`.
-      
-      *  Two examples `_example_panel_prodesDeforestationAmazonMuni_muniLevel.Rdata`, and `_example_panel_priorityMuniAmazon_muniLevel.Rdata` of the `dataFormat_variableTheme_folderName.Rdata`.
-      
-      *  Three examples `_example_panel_forAnalysis_muniLevel.Rdata`, `_example_crossSection_forAnalysis_muniLevel.Rdata`, and `_example_spatial_forAnalysis_muniLevel.Rdata` of the `dataFormat_forAnalysis_folderName.Rdata`.
-      
-  
-## License
-The material in this repository is made available under a dual-license setup. See [LICENSE](LICENSE) for details. 
+#### Amazon Priority Municipalities
+
+Data on Amazon Priority Municipalities were downloaded from the Ministério do Meio Ambiente (MMA) (MMA, 2017). Data can be directly downloaded from https://web.archive.org/web/20200915211728/http://combateaodesmatamento.mma.gov.br/images/conteudo/lista_municipios_prioritarios_AML_2017.pdf. The link will open a pdf file. The pdf file was manually saved in the `"raw2clean/priorityMuniAmazon/input"` folder. A copy of the data is provided as part of this archive. The data are in the public domain.
+
+Datafiles: `"lista_municipios_prioritarios_AML_2017.pdf"`
+
+Codebook: `"raw2clean/priorityMuniAmazon/documentation/codebook_priorityMuniAmazon.txt"`
+
+Metadata: `"raw2clean/priorityMuniAmazon/documentation/_metadata.txt"`
+
+#### Legal Amazon PRODES Deforestation Municipality-Level
+
+Data on Legal Amazon PRODES Deforestation Municipality-Level were downloaded from the  Instituto Nacional de Pesquisas Espaciais (INPE)  (MMA, 2001-2020). Data can be directly downloaded for each year using the following links: [2000](https://web.archive.org/web/20200915164422/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2000&estado=&ordem=DESMATAMENTO2000&type=tabela&output=txt); [2001](https://web.archive.org/web/20200915164614/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2001&estado=&ordem=DESMATAMENTO2001&type=tabela&output=txt&); [2002](https://web.archive.org/web/20200915164920/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2002&estado=&ordem=DESMATAMENTO2002&type=tabela&output=txt); [2003](https://web.archive.org/web/20200915165014/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2003&estado=&ordem=DESMATAMENTO2003&type=tabela&output=txt); [2004](https://web.archive.org/web/20200915165038/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2004&estado=&ordem=DESMATAMENTO2004&type=tabela&output=txt); [2005](https://web.archive.org/web/20200915165211/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2005&estado=&ordem=DESMATAMENTO2005&type=tabela&output=txt); [2006](https://web.archive.org/web/20200915165249/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2006&estado=&ordem=DESMATAMENTO2006&type=tabela&output=txt); [2007](https://web.archive.org/web/20200915165303/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2007&estado=&ordem=DESMATAMENTO2007&type=tabela&output=txt); [2008](https://web.archive.org/web/20200915165337/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2008&estado=&ordem=DESMATAMENTO2008&type=tabela&output=txt); [2009](https://web.archive.org/web/20200915165353/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2009&estado=&ordem=DESMATAMENTO2009&type=tabela&output=txt); [2010](https://web.archive.org/web/20200915165427/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2010&estado=&ordem=DESMATAMENTO2010&type=tabela&output=txt); [2011](https://web.archive.org/web/20200915165439/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2011&estado=&ordem=DESMATAMENTO2011&type=tabela&output=txt); [2012](https://web.archive.org/web/20200915165504/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2012&estado=&ordem=DESMATAMENTO2012&type=tabela&output=txt); [2013](https://web.archive.org/web/20200915165526/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2013&estado=&ordem=DESMATAMENTO2013&type=tabela&output=txt); [2014](https://web.archive.org/web/20200915165551/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2014&estado=&ordem=DESMATAMENTO2014&type=tabela&output=txt); [2015](https://web.archive.org/web/20200915165615/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2015&estado=&ordem=DESMATAMENTO2015&type=tabela&output=txt); [2016](https://web.archive.org/web/20200915165626/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2016&estado=&ordem=DESMATAMENTO2016&type=tabela&output=txt); [2017](https://web.archive.org/web/20201019163830/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2017&estado=&ordem=DESMATAMENTO2017&type=tabela&output=txt); [2018](https://web.archive.org/web/20201019163935/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2018&estado=&ordem=DESMATAMENTO2018&type=tabela&output=txt); [2019](https://web.archive.org/web/20201019164015/http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2019&estado=&ordem=DESMATAMENTO2019&type=tabela&output=txt)
+
+The links will download txt files. The txt files were saved in the `"raw2clean/prodesDeforestationAmazonMuni/input"` folder. A copy of the data is provided as part of this archive. The data are in the public domain.
+
+Datafiles: 20 files with pattern `"DesmatamentoMunicipiosYYYY.txt"` with YYYY going from 2001 through 2019
+
+Codebook: `"raw2clean/prodesDeforestationAmazonMuni/documentation/codebook_prodesDeforestationAmazonMuni.txt"`
+
+Metadata: `"raw2clean/prodesDeforestationAmazonMuni/documentation/_metadata.txt"`
+
+
+Computational requirements
+---------------------------
+
+### Software Requirements
+
+- R 4.0.2
+  - the file `"renv.lock"` has all R packages and dependencies version used in the project.
+  - the file `"reproducible_paper_example.Rproj"` will guarantee that the working directory is set to the root of the project (always open RStudio using this file).
+
+
+### Memory and Runtime Requirements
+
+#### Summary
+
+Approximate time needed to reproduce the analyses on a standard (CURRENT YEAR) desktop machine:
+
+- [X] 1-8 hours
+
+#### Details
+
+The code was last run on a **4-core Laptop; Intel Core i7-855U CPU @ 1.80 GHz processor; 16GB RAM; Windows 10 Home**. 
+ 
+Total disk size (expected) to be consumed by the project considering everything (including intermediate dataset, libraries, etc.) in an uncompressed format is approximately 1GB (~450 files). 
+ 
+Description of programs/code
+----------------------------
+
+- `"code/_MASTERFILE.R"` will run individual master files for each folder: 
+  - `"code/raw2clean/masterfile_raw2clean.R"` will run one R script to clean each input dataset (4 scripts).
+  - `"code/projectSpecific/muniLevel/_masterfile_projectSpecific_muniLevel.R"` will construct the base sample, extract the information from each dataset relevant for this paper, construct the variables of interest, merge them with the base sample, and generate the sample for analysis in multiple formats: cross-section, spatial, panel (4 scripts).
+  - `"code/analysis/masterfile_analysis.R"` will generate all tables and figures (PENDING scripts).
+
+### License for Code 
+
+The code is licensed under a Modified BSD License. See [LICENSE.txt](LICENSE.txt) for details.
+
+Instructions to Replicators 
+---------------------------
+
+- Download replication package.
+- Open RStudio using `"reproducible_paper_example.Rproj"` to set the working directory to the project root.
+- Run `"renv::restore"` in the R console. Write `"y"` in the R console to answer the question `"Do you want to proceed? [y/N]:"`.
+- Run `"code/_MASTERFILE.R"` to run all R scripts in sequence.
+
+
+### Details
+
+- `"reproducible_paper_example.Rproj"`: will bootstrap renv package the first time it is opened. 
+- `"renv::restore"`: will install all the necessary R packages and dependencies with the specified versions.
+
+List of tables and programs 
+---------------------------
+
+> PENDING - will be completed in the next version after including the analysis examples. 
+
+The provided code reproduces:
+
+- [ ] All numbers provided in text in the paper
+- [ ] All tables and figures in the paper
+- [ ] Selected tables and figures in the paper, as explained and justified below.
+
+
+| Figure/Table #    | Program                  | Line Number | Output file                      | Note                            |
+|-------------------|--------------------------|-------------|----------------------------------|---------------------------------|
+| Table 1           | 02_analysis/table1.do    |             | summarystats.csv                 ||
+| Table 2           | 02_analysis/table2and3.do| 15          | table2.csv                       ||
+| Table 3           | 02_analysis/table2and3.do| 145         | table3.csv                       ||
+| Figure 1          | n.a. (no data)           |             |                                  | Source: Herodus (2011)          |
+| Figure 2          | 02_analysis/fig2.do      |             | figure2.png                      ||
+| Figure 3          | 02_analysis/fig3.do      |             | figure-robustness.png            | Requires confidential data      |
+
+## Acknowledgements
+
+Adapted from Villhuber et al (2020).
+
+## References
+
+**Instituto Brasileiro de Geografia e Estatística (IBGE)**. 2015. "Malhas Muncipais: shapefile, 2015." Instituto Brasileiro de Geografia e Estatística, Ministério da Economia. https://web.archive.org/web/20200916142056/ftp://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2015/Brasil/BR/br_municipios.zip (accessed via Archive.org September 16, 2020).
+
+**Instituto Brasileiro de Geografia e Estatística (IBGE)**. 2019. "Biomas do Brasil: shapefile, 2019." Instituto Brasileiro de Geografia e Estatística, Ministério da Economia. https://web.archive.org/web/20200916173523/ftp://geoftp.ibge.gov.br/informacoes_ambientais/estudos_ambientais/biomas/vetores/Biomas_250mil.zip (accessed via Archive.org September 16, 2020).
+
+**Instituto Nacional de Pesquisas Espaciais (INPE)**. 2001-2020. "Projeto PRODES - Monitoramento da Floresta Amazônica Brasileira por Satélite: Desmatamento nos Municípios, 2000-2019." Coordenação-Geral de Observação da Terra (OBT), Instituto Nacional de Pesquisas Espaciais (INPE), Ministério da Ciência, Tecnologia e Inovação (MCTI). http://www.dpi.inpe.br/prodesdigital/prodesmunicipal.php (accessed October 24, 2020).
+
+**Ministério do Meio Ambiente (MMA)**. 2017. "Lista de Municípios Prioritários da Amazônia: 2008-2017." Ministério do Meio Ambiente (MMA). https://web.archive.org/web/20200915211728/http://combateaodesmatamento.mma.gov.br/images/conteudo/lista_municipios_prioritarios_AML_2017.pdf (accessed via Archive.org on September 15, 2020)
+
+**Vilhuber, L., Connolly, M., Koren, M., Llull, J., and Morrow, P.**. 2020. "A template README for social science replication packages (Version v1.0.0)". Zenodo. http://doi.org/10.5281/zenodo.4319999 (accessed March 2, 2021)
+
+---
